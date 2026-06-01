@@ -1,41 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 
 export const ThemeToggle: React.FC = () => {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const savedTheme = localStorage.getItem('hms_theme');
-    if (savedTheme) {
-      return savedTheme === 'dark';
-    }
-    // Fallback to dark mode by default for premium feel
-    return true;
-  });
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (isDark) {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    setIsDark(shouldBeDark);
+    applyTheme(shouldBeDark);
+  }, []);
+
+  const applyTheme = (dark: boolean) => {
+    const root = document.documentElement;
+    if (dark) {
       root.classList.add('dark');
-      localStorage.setItem('hms_theme', 'dark');
     } else {
       root.classList.remove('dark');
-      localStorage.setItem('hms_theme', 'light');
     }
-  }, [isDark]);
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  };
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
+    applyTheme(!isDark);
+  };
 
   return (
-    <button
-      onClick={() => setIsDark(!isDark)}
-      className="p-2 rounded-full border border-border bg-card text-foreground hover:bg-muted transition-all duration-300 relative overflow-hidden group shadow-sm"
-      aria-label="Toggle Theme"
-      id="theme-toggle"
-    >
-      <div className="relative w-5 h-5 flex items-center justify-center">
-        {isDark ? (
-          <Sun className="w-5 h-5 text-amber-400 rotate-0 transition-transform duration-500 group-hover:rotate-45" />
-        ) : (
-          <Moon className="w-5 h-5 text-indigo-600 rotate-0 transition-transform duration-500 group-hover:-rotate-12" />
-        )}
-      </div>
+    <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="Toggle theme">
+      {isDark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
     </button>
   );
 };

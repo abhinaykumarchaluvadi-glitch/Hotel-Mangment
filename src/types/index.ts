@@ -2,93 +2,72 @@ export type UserRole = 'admin' | 'customer';
 
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
   role: UserRole;
+  phone?: string;
+  address?: string;
   createdAt: string;
 }
 
-export type RoomStatus = 'available' | 'occupied' | 'maintenance';
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
 
 export interface Room {
   id: string;
-  roomNumber: string;
-  type: string; // e.g. Single, Double, Deluxe, Suite
+  number: string;
+  type: 'single' | 'double' | 'suite' | 'deluxe';
   price: number;
-  status: RoomStatus;
-  amenities: string[]; // e.g. WiFi, TV, AC, Mini Bar, Ocean View
-  image: string;
-  description: string;
+  capacity: number;
+  amenities: string[];
+  available: boolean;
+  images?: string[];
 }
-
-export type BookingStatus = 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
 
 export interface Booking {
   id: string;
   userId: string;
-  user?: User; // Joined data
   roomId: string;
-  room?: Room; // Joined data
-  checkIn: string; // ISO date string
-  checkOut: string; // ISO date string
+  room?: Room;
+  checkInDate: string;
+  checkOutDate: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   totalPrice: number;
-  status: BookingStatus;
+  guestCount: number;
   createdAt: string;
 }
-
-export type FoodCategory = 'breakfast' | 'lunch' | 'dinner' | 'beverages' | 'snacks';
 
 export interface FoodItem {
   id: string;
   name: string;
   description: string;
   price: number;
-  category: FoodCategory;
-  isAvailable: boolean;
-  image: string;
-}
-
-export type FoodOrderStatus = 'pending' | 'preparing' | 'delivered' | 'cancelled';
-
-export interface FoodOrderItem {
-  foodItemId: string;
-  name: string;
-  price: number;
-  quantity: number;
+  category: string;
+  available: boolean;
+  image?: string;
 }
 
 export interface FoodOrder {
   id: string;
-  bookingId: string;
-  roomNumber: string;
-  items: FoodOrderItem[];
-  totalAmount: number;
-  status: FoodOrderStatus;
+  userId: string;
+  bookingId?: string;
+  items: Array<{ itemId: string; quantity: number; price: number }>;
+  status: 'pending' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
+  totalPrice: number;
+  deliveryTime?: string;
   createdAt: string;
 }
-
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface Payment {
   id: string;
-  bookingId: string;
+  userId: string;
+  bookingId?: string;
+  orderId?: string;
   amount: number;
-  status: PaymentStatus;
-  method: string; // e.g. Credit Card, PayPal, Cash
-  transactionId: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  method: 'card' | 'bank' | 'wallet';
+  transactionId?: string;
   createdAt: string;
-}
-
-export interface DashboardStats {
-  totalRooms: number;
-  availableRooms: number;
-  occupiedRooms: number;
-  maintenanceRooms: number;
-  totalBookings: number;
-  activeBookings: number;
-  totalRevenue: number;
-  occupancyRate: number;
-  revenueByMonth: { month: string; revenue: number }[];
-  occupancyByRoomType: { name: string; value: number }[];
-  bookingTrends: { date: string; bookings: number }[];
 }

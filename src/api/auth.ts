@@ -1,74 +1,98 @@
-import { apiClient, isMockMode, mockDelay } from './client';
-import { mockDb } from './mockDb';
+import apiClient, { isMockMode } from './client';
+import type { User, AuthResponse } from '../types';
 import type { LoginFormData, RegisterFormData } from '../schemas/auth';
-import type { User } from '../types';
 
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
+const mockUsers: { [key: string]: { user: User; password: string } } = {
+  'admin@hotel.com': {
+    user: {
+      id: '1',
+      email: 'admin@hotel.com',
+      name: 'Admin User',
+      role: 'admin',
+      phone: '+1234567890',
+      address: '123 Admin Street',
+      createdAt: new Date().toISOString(),
+    },
+    password: 'admin123',
+  },
+  'guest@hotel.com': {
+    user: {
+      id: '2',
+      email: 'guest@hotel.com',
+      name: 'Guest User',
+      role: 'customer',
+      phone: '+0987654321',
+      address: '456 Guest Avenue',
+      createdAt: new Date().toISOString(),
+    },
+    password: 'guest123',
+  },
+};
+
+const generateMockToken = (user: User): string => {
+  return `mock_token_${user.id}_${Date.now()}`;
+};
 
 export const authApi = {
   login: async (data: LoginFormData): Promise<AuthResponse> => {
     if (isMockMode()) {
-      await mockDelay(600);
-      const users = mockDb.getUsers();
-      const user = users.find((u) => u.email === data.email);
-      
-      if (!user) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const userRecord = mockUsers[data.email];
+      if (!userRecord || userRecord.password !== data.password) {
         throw new Error('Invalid email or password');
       }
-      
-      // Simulate token generation
-      const mockToken = `mock-jwt-token-for-${user.id}`;
-      return { user, token: mockToken };
+      return {
+        token: generateMockToken(userRecord.user),
+        user: userRecord.user,
+      };
     }
-
-    const response = await apiClient.post<AuthResponse>('/auth/login', data);
-    return response.data;
+    try {
+      const response = await apiClient.post<AuthResponse>('/auth/login', data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Login failed');
+    }
   },
 
   register: async (data: RegisterFormData): Promise<AuthResponse> => {
     if (isMockMode()) {
-      await mockDelay(700);
-      const users = mockDb.getUsers();
-      const exists = users.some((u) => u.email === data.email);
-      if (exists) {
-        throw new Error('Email address already registered');
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (mockUsers[data.email]) {
+        throw new Error('Email already registered');
       }
-
       const newUser: User = {
-        id: `usr-${Date.now()}`,
-        name: data.name,
+        id: Date.now().toString(),
         email: data.email,
-        role: data.role || 'customer',
+        name: data.name,
+        role: 'customer',
+        phone: data.phone,
+        address: data.address,
         createdAt: new Date().toISOString(),
       };
-
-      mockDb.setUsers([...users, newUser]);
-      const mockToken = `mock-jwt-token-for-${newUser.id}`;
-      return { user: newUser, token: mockToken };
+      mockUsers[data.email] = { user: newUser, password: data.password };
+      return {
+        token: generateMockToken(newUser),
+        user: newUser,
+      };
     }
-
-    const response = await apiClient.post<AuthResponse>('/auth/register', data);
-    return response.data;
+    try {
+      const response = await apiClient.post<AuthResponse>('/auth/register', data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Registration failed');
+    }
   },
 
   getCurrentUser: async (): Promise<User> => {
     if (isMockMode()) {
-      await mockDelay(200);
-      const token = localStorage.getItem('hms_token');
-      if (!token) throw new Error('Not authenticated');
-
-      const userId = token.replace('mock-jwt-token-for-', '');
-      const users = mockDb.getUsers();
-      const user = users.find((u) => u.id === userId);
-      if (!user) throw new Error('User not found');
-      
-      return user;
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return mockUsers['guest@hotel.com'].user;
     }
-
-    const response = await apiClient.get<User>('/auth/me');
-    return response.data;
+    try {
+      const response = await apiClient.get<User>('/auth/me');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to get user');
+    }
   },
 };

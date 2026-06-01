@@ -1,127 +1,79 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../store/AuthContext';
-import { Button, Input } from '../../components/ui/core';
-import { UserPlus, User, Mail, Key, ShieldAlert } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema } from '../../schemas/auth';
-import type { RegisterFormData } from '../../schemas/auth';
+import { registerSchema, type RegisterFormData } from '../../schemas/auth';
+import { useAuth } from '../../store/AuthContext';
+import { User, Mail, Lock, Phone, MapPin, UserPlus } from 'lucide-react';
 
 export const Register: React.FC = () => {
-  const { register: signup } = useAuth();
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
+  const { register: registerUser } = useAuth();
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setError(null);
-    setLoading(true);
+    setError('');
+    setIsLoading(true);
     try {
-      await signup(data);
+      await registerUser(data);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Email might already be taken.');
+      setError(err.message || 'Registration failed');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center relative"
-      style={{ 
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.8)), url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=1920')` 
-      }}
-    >
-      <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
-
-      {/* Register Card */}
-      <div className="w-full max-w-md glass rounded-2xl border border-white/10 p-8 shadow-2xl relative z-10 text-white">
-        <div className="text-center mb-6">
-          <h2 className="text-sm font-semibold tracking-[0.25em] text-primary uppercase mb-2">Join Us</h2>
-          <h1 className="text-3xl font-serif tracking-wide text-white">GRAND ROYALE</h1>
-          <p className="text-xs text-white/60 mt-1">Begin your tailored luxury experience</p>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive-foreground text-xs flex items-center gap-3">
-            <ShieldAlert className="w-5 h-5 text-destructive shrink-0" />
-            <span>{error}</span>
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-primary/5 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-card rounded-2xl shadow-xl border border-border p-8 space-y-8">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-serif font-bold tracking-wider text-primary">GRAND ROYALE</h1>
+            <p className="text-sm text-muted-foreground">Create Your Account</p>
           </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase tracking-wider text-white/80 flex items-center gap-2">
-              <User className="w-3.5 h-3.5" /> Full Name
-            </label>
-            <Input
-              type="text"
-              placeholder="Alexander Mercer"
-              className="bg-black/20 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary"
-              error={errors.name?.message}
-              {...register('name')}
-            />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2"><User className="w-4 h-4" />Full Name</label>
+              <input {...register('name')} type="text" placeholder="John Doe" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2"><Mail className="w-4 h-4" />Email Address</label>
+              <input {...register('email')} type="email" placeholder="you@example.com" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2"><Phone className="w-4 h-4" />Phone (Optional)</label>
+              <input {...register('phone')} type="tel" placeholder="+1234567890" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2"><MapPin className="w-4 h-4" />Address (Optional)</label>
+              <input {...register('address')} type="text" placeholder="123 Main Street" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2"><Lock className="w-4 h-4" />Password</label>
+              <input {...register('password')} type="password" placeholder="••••••••" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2"><Lock className="w-4 h-4" />Confirm Password</label>
+              <input {...register('confirmPassword')} type="password" placeholder="••••••••" className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" />
+              {errors.confirmPassword && <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>}
+            </div>
+            {error && <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">{error}</div>}
+            <button type="submit" disabled={isLoading} className="w-full bg-primary text-primary-foreground font-semibold py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+              <UserPlus className="w-4 h-4" />
+              {isLoading ? 'Creating account...' : 'Create Account'}
+            </button>
+          </form>
+          <div className="border-t border-border pt-6 text-center">
+            <p className="text-sm text-muted-foreground">Already have an account? <a href="/login" className="text-primary hover:underline font-semibold">Sign in</a></p>
           </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase tracking-wider text-white/80 flex items-center gap-2">
-              <Mail className="w-3.5 h-3.5" /> Email Address
-            </label>
-            <Input
-              type="email"
-              placeholder="alex@example.com"
-              className="bg-black/20 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary"
-              error={errors.email?.message}
-              {...register('email')}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase tracking-wider text-white/80 flex items-center gap-2">
-              <Key className="w-3.5 h-3.5" /> Password
-            </label>
-            <Input
-              type="password"
-              placeholder="••••••••"
-              className="bg-black/20 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary"
-              error={errors.password?.message}
-              {...register('password')}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase tracking-wider text-white/80 flex items-center gap-2">
-              <Key className="w-3.5 h-3.5" /> Confirm Password
-            </label>
-            <Input
-              type="password"
-              placeholder="••••••••"
-              className="bg-black/20 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-primary"
-              error={errors.confirmPassword?.message}
-              {...register('confirmPassword')}
-            />
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-            isLoading={loading}
-          >
-            <UserPlus className="w-4 h-4 mr-2" /> Register Guest Account
-          </Button>
-        </form>
-
-        <div className="mt-6 text-center text-xs text-white/60">
-          Already have an account?{' '}
-          <Link to="/login" className="text-primary hover:underline font-semibold">
-            Sign In Instead
-          </Link>
         </div>
       </div>
     </div>
