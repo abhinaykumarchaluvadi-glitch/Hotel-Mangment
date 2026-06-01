@@ -15,9 +15,12 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Get the base path for GitHub Pages (or empty for root deployment)
+  const basename = import.meta.env.DEV ? '/' : '/Hotel-Mangment/';
+
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <AuthProvider>
           <AppRoutes />
         </AuthProvider>
