@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// Determine if we should use Mock Database (defaults to true for standalone operation)
+// Determine if we should use Mock Database (defaults to false for real server operation)
 const MOCK_KEY = 'hms_use_mock';
-if (localStorage.getItem(MOCK_KEY) === null) {
-  localStorage.setItem(MOCK_KEY, 'true');
+if (localStorage.getItem(MOCK_KEY) === null || localStorage.getItem(MOCK_KEY) === 'true') {
+  localStorage.setItem(MOCK_KEY, 'false');
 }
 
 export const isMockMode = (): boolean => {

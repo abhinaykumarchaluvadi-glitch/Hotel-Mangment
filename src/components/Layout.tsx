@@ -130,7 +130,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
               }`}
             >
-              {isMock ? 'Mock DB' : 'FastAPI'}
+              {isMock ? 'Mock DB' : 'Flask API'}
             </button>
           </div>
 
@@ -220,7 +220,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                         : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                     }`}
                   >
-                    {isMock ? 'Mock DB' : 'FastAPI'}
+                    {isMock ? 'Mock DB' : 'Flask API'}
                   </button>
                 </div>
 
@@ -258,7 +258,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Show active indicators */}
             {isMock && (
               <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20 animate-pulse">
-                Mocking FastAPI Sandbox
+                Mocking Flask API Sandbox
               </span>
             )}
             <ThemeToggle />

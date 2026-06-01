@@ -3,3 +3,4 @@ backend
 dist
 .vscode
 *.log
+venv
