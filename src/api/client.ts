@@ -1,9 +1,12 @@
 import axios from 'axios';
 
-// Determine if we should use Mock Database (defaults to false for real server operation)
+// Determine if we should use Mock Database
+// In production (GitHub Pages) default to mock mode since there's no backend server.
+// In development, default to false so we use the local backend.
 const MOCK_KEY = 'hms_use_mock';
-if (localStorage.getItem(MOCK_KEY) === null || localStorage.getItem(MOCK_KEY) === 'true') {
-  localStorage.setItem(MOCK_KEY, 'false');
+if (localStorage.getItem(MOCK_KEY) === null) {
+  const defaultMock = import.meta.env.PROD ? 'true' : 'false';
+  localStorage.setItem(MOCK_KEY, defaultMock);
 }
 
 export const isMockMode = (): boolean => {
