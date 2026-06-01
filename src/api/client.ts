@@ -15,7 +15,8 @@ export const setMockMode = (value: boolean) => {
   window.location.reload(); // reload to re-initialize queries
 };
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const DEFAULT_BASE_URL = import.meta.env.PROD ? '/api/v1' : 'http://localhost:8000/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || DEFAULT_BASE_URL;
 
 // Create Axios Instance
 export const apiClient = axios.create({
