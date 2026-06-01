@@ -1,0 +1,17 @@
+{
+  "name": "hotel-management-backend",
+  "version": "1.0.0",
+  "description": "Express Backend for Hotel Management System",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0"
+  }
+}
