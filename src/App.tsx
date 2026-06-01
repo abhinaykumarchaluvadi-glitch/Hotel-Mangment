@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './store/AuthContext';
 import { AppRoutes } from './routes/AppRoutes';
@@ -15,16 +15,13 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  // Get the base path for GitHub Pages (or empty for root deployment)
-  const basename = import.meta.env.DEV ? '/' : '/Hotel-Mangment/';
-
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter basename={basename}>
+      <HashRouter>
         <AuthProvider>
           <AppRoutes />
         </AuthProvider>
-      </BrowserRouter>
+      </HashRouter>
     </QueryClientProvider>
   );
 }
